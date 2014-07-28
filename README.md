@@ -1,7 +1,7 @@
 nacl-stream: streaming encryption based on TweetNaCl.js
 =======================================================
 
-Written by Dmitry Chestnykh in 2014. Public domain.
+Written by Dmitry Chestnykh in 2014. Public domain. 
 <https://github.com/dchest/nacl-stream-js>
 
 Based on
