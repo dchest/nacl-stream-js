@@ -50,14 +50,19 @@
     this._fullNonce.set(nonce);
     this._in = new Uint8Array(ZEROBYTES + MAX_CHUNK_LEN);
     this._out = new Uint8Array(ZEROBYTES + MAX_CHUNK_LEN);
+    this._done = false;
   }
 
   StreamEncryptor.prototype.encryptChunk = function(chunk, isLast) {
+    if (this._done) throw new Error('called encryptChunk after last chunk');
     var chunkLen = chunk.length;
     if (chunkLen > MAX_CHUNK_LEN) throw new Error('chunk is too large');
     for (var i = 0; i < ZEROBYTES; i++) this._in[i] = 0;
     this._in.set(chunk, ZEROBYTES);
-    if (isLast) setLastChunkFlag(this._fullNonce);
+    if (isLast) {
+      setLastChunkFlag(this._fullNonce);
+      this._done = true;
+    }
     crypto_secretbox(this._out, this._in, chunkLen + ZEROBYTES, this._fullNonce, this._key);
     incrementChunkCounter(this._fullNonce);
     var encryptedChunk = this._out.subarray(BOXZEROBYTES-2, BOXZEROBYTES-2 + chunkLen+16+2);
@@ -78,6 +83,7 @@
     this._in = new Uint8Array(ZEROBYTES + MAX_CHUNK_LEN);
     this._out = new Uint8Array(ZEROBYTES + MAX_CHUNK_LEN);
     this._failed = false;
+    this._done = false;
   }
 
   StreamDecryptor.prototype._fail = function() {
@@ -93,6 +99,7 @@
 
   StreamDecryptor.prototype.decryptChunk = function(encryptedChunk, isLast) {
     if (this._failed) return null;
+    if (this._done) throw new Error('called decryptChunk after last chunk');
     var encryptedChunkLen = encryptedChunk.length;
     if (encryptedChunkLen < 2 + BOXZEROBYTES) return this._fail();
     var chunkLen = this.readLength(encryptedChunk);
@@ -100,7 +107,10 @@
     if (chunkLen + 2 + BOXZEROBYTES !== encryptedChunkLen) return this._fail();
     for (var i = 0; i < BOXZEROBYTES; i++) this._in[i] = 0;
     for (i = 0; i < encryptedChunkLen-2; i++) this._in[BOXZEROBYTES+i] = encryptedChunk[i+2];
-    if (isLast) setLastChunkFlag(this._fullNonce);
+    if (isLast) {
+      setLastChunkFlag(this._fullNonce);
+      this._done = true;
+    }
     if (crypto_secretbox_open(this._out, this._in, encryptedChunkLen+BOXZEROBYTES-2,
                 this._fullNonce, this._key) !== 0) return this._fail();
     incrementChunkCounter(this._fullNonce);
