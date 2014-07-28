@@ -18,6 +18,7 @@
     "encryption",
     "decryption",
     "streaming",
+    "chunking",
     "nacl",
     "tweetnacl",
     "file"

@@ -1,0 +1,33 @@
+{
+  "name": "nacl-stream",
+  "version": "0.1.0",
+  "homepage": "https://github.com/dchest/nacl-stream-js",
+  "authors": [
+    "Dmitry Chestnykh <dmitry@codingrobots.com>"
+  ],
+  "description": "Streaming encryption based on TweetNaCl.js",
+  "main": "nacl-stream.js",
+  "moduleType": [
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "encryption",
+    "decryption",
+    "streaming",
+    "chunking",
+    "nacl",
+    "tweetnacl",
+    "file"
+  ],
+  "license": "Public domain",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test"
+  ],
+  "dependencies": {
+    "tweetnacl": "^0.10.0"
+  }
+}
