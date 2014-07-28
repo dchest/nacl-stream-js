@@ -73,11 +73,11 @@ Returns a stream decryptor object using 32-byte key and 16-byte nonce (both of
 #### *decryptor*.decryptChunk(encryptedChunk, isLast)
 
 Decrypts the given `Uint8Array` encrypted chunk and returns an `Uint8Array`
-subarray into internal temporary space containing the decrypted chunk.  Callers
-must copy the result into their own buffer, as the next call to `decryptChunk`
-will overwrite the contents of returned `Uint8Array`.  The given encryptedChunk
-should be in the format created by `encryptChunk`, i.e. prefixed with original
-chunk length.
+subarray of the internal temporary space containing the decrypted chunk.
+Callers must copy the result into their own buffer, as the next call to
+`decryptChunk` will overwrite the contents of returned `Uint8Array`. The given
+encryptedChunk should be in the format created by `encryptChunk`, i.e. prefixed
+with original chunk length.
 
 Returns `null` if the chunk cannot be decrypted. In this case, futher
 calls to `decryptChunk` will deliberately fail: callers should stop trying
