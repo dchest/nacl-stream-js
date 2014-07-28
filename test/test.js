@@ -55,6 +55,7 @@ test('stream', function(t) {
 
   var decryptedChunks = decryptChunks(encryptedChunks);
   t.ok(decryptedChunks, 'should decrypt chunks');
+  t.equal(decryptedChunks.length, encryptedChunks.length, 'number of decrypted chunks should be equal to encrypted');
   t.ok(compareChunksWithData(decryptedChunks), 'decrypted data should be equal to original');
 
   // Drop last chunk.
