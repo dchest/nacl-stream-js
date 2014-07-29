@@ -123,7 +123,7 @@ function decryptBlob(key, nonce, blob, mimeType, doneCallback, errorCallback, pr
           return;
         }
 
-        // A chunk was encrypted, save it...
+        // A chunk was decrypted, save it...
         decryptedChunks.push(event.data.decryptedChunk);
 
         // ...and report progress.
@@ -133,7 +133,7 @@ function decryptBlob(key, nonce, blob, mimeType, doneCallback, errorCallback, pr
           // Feed the next chunk to worker.
           postNextChunk();
         } else {
-          // This chunk was last, so finish encryption.
+          // This chunk was last, so finish decryption.
           worker.postMessage({
             name: 'DECRYPT_FINISH'
           });
