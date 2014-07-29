@@ -112,7 +112,7 @@ function decryptBlob(key, nonce, blob, mimeType, doneCallback, errorCallback, pr
     switch (event.data.name) {
 
       case 'DECRYPT_START_OK':
-        // Encryption started, feed the first chunk to worker.
+        // Decryption started, feed the first chunk to worker.
         postNextChunk();
         break;
 
@@ -141,12 +141,12 @@ function decryptBlob(key, nonce, blob, mimeType, doneCallback, errorCallback, pr
        break;
 
       case 'DECRYPT_FINISH_OK':
-        // Encryption finished!
+        // Decryption finished!
         doneCallback(new Blob(decryptedChunks, {type: mimeType}));
         break;
 
       case 'DECRYPT_CANCEL_OK':
-        // Encryption canceled.
+        // Decryption canceled.
         errorCallback(event.data.reason);
         break;
 
@@ -232,6 +232,7 @@ function decryptBlob(key, nonce, blob, mimeType, doneCallback, errorCallback, pr
 var key = new Uint8Array(32);
 var nonce = new Uint8Array(16);
 var arr = new Uint8Array(1 * 1024*1024);
+for (var i = 0; i < arr.length; i++) arr[i] = i & 0xff;
 var blob = new Blob([arr]);
 
 var startTime = new Date();
