@@ -16,7 +16,7 @@ Format description
 ------------------
 
 - Inputs: 32-byte key, 16-byte nonce, a stream (or a file).
-- Stream is split into chunks of max 65535 bytes.
+- Stream is split into chunks of the specified length.
 - 24-byte fullNonce is acquired by concatenating 16-byte nonce and 8-byte
   little-endian chunk number.
 - Each chunk except for the last one is encrypted like this, starting with
@@ -28,7 +28,7 @@ Format description
   encryptedChunk1 := len(chunk1) || nacl.secretbox(chunk1, fullNonce1, key)
   ...
   ```
-  where `len(chunk)` is a 2-byte little-endian plaintext chunk length.
+  where `len(chunk)` is a 4-byte little-endian plaintext chunk length.
 
 - The last chunk's fullNonce has the most significant bit set:
   ```
@@ -46,10 +46,10 @@ high-level API which would deal with actual streams or files.**
 The module provides two constructor functions (in `window.nacl` namespace or as
 a CommonJS module):
 
-### stream.createEncryptor(key, nonce)
+### stream.createEncryptor(key, nonce, maxChunkLength)
 
 Returns a stream encryptor object using 32-byte key and 16-byte nonce (both of
-`Uint8Array` type) with the following methods:
+`Uint8Array` type) and the maximum chunk length with the following methods:
 
 #### *encryptor*.encryptChunk(chunk, isLast)
 
@@ -65,7 +65,7 @@ Zeroes out temporary space. Should be called after encrypting all chunks.
 ### stream.createDecryptor(key, nonce)
 
 Returns a stream decryptor object using 32-byte key and 16-byte nonce (both of
-`Uint8Array` type) with the following methods:
+`Uint8Array` type) and the maximum chunk length with the following methods:
 
 #### *decryptor*.decryptChunk(encryptedChunk, isLast)
 
@@ -82,16 +82,13 @@ chunks.
 
 If decrypting the last chunk of stream, `isLast` must be set to `true`.
 
-#### *decryptor*.readLength(data)
-
-Reads two bytes from the beginning of `Uint8Array` data and returns the chunk
-length. Length of encryptedChunk passed to `decryptChunk` should be 2 + 16 +
-*chunkLength* bytes.
-
 #### *decryptor*.clean()
  
 Zeroes out temporary space. Should be called after decrypting all chunks.
 
-### stream.maxChunkLength = 65535
+#### stream.readChunkLength(data[, offset])
 
-Maximum length of plaintext chunk.
+Reads four bytes from the given offset (or from the beginning, if no offset is
+given) of `Uint8Array` data and returns the chunk length. Length of
+encryptedChunk passed to `decryptChunk` should be 4 + 16 + *chunkLength* bytes.
+

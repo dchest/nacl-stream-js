@@ -1,3 +1,5 @@
+var CHUNK_LENGTH = 1024 * 1024; // 1 MB
+
 function encryptBlob(key, nonce, blob, mimeType, doneCallback, errorCallback, progressCallback) {
   // We will collect encrypted chunks in this array:
   var encryptedChunks = [];
@@ -71,7 +73,7 @@ function encryptBlob(key, nonce, blob, mimeType, doneCallback, errorCallback, pr
   // Feeds next chunk to worker and advances position.
   function postNextChunk() {
     var isLast = false;
-    var end = position + 65535;
+    var end = position + CHUNK_LENGTH;
     if (end >= blob.size) {
       end = blob.size;
       isLast = true;
@@ -91,7 +93,8 @@ function encryptBlob(key, nonce, blob, mimeType, doneCallback, errorCallback, pr
   worker.postMessage({
     name: 'ENCRYPT_START',
     key: key,
-    nonce: nonce
+    nonce: nonce,
+    maxChunkLength: CHUNK_LENGTH
   });
 }
 
@@ -183,26 +186,26 @@ function decryptBlob(key, nonce, blob, mimeType, doneCallback, errorCallback, pr
         error('blob is too short');
         return;
       }
-      readBlobSlice(blob, position, position + 2, function(data) {
-        nextChunkSize = (data[0] | data[1] << 8);
-        position = 2;
+      readBlobSlice(blob, position, position + 4, function(data) {
+        nextChunkSize = nacl.stream.readChunkLength(data);
+        position = 4;
         // Now that we have chunk size, call ourselves again.
         postNextChunk();
       });
     } else {
       // Read next chunk + length of the following chunk after it.
       var isLast = false;
-      var end = position + nextChunkSize + 16 /* tag */ + 2 /* length */;
+      var end = position + nextChunkSize + 16 /* tag */ + 4 /* length */;
       if (end >= blob.size) {
         end = blob.size;
         isLast = true;
       }
-      readBlobSlice(blob, position - 2 /* include chunk length */, end, function(chunk) {
+      readBlobSlice(blob, position - 4 /* include chunk length */, end, function(chunk) {
         if (!isLast) {
           // Read next chunk's length.
-          nextChunkSize = (chunk[chunk.length-2] | chunk[chunk.length-1] << 8);
+          nextChunkSize = nacl.stream.readChunkLength(chunk, chunk.length-4);
           // Slice the length off.
-          chunk = chunk.subarray(0, chunk.length-2);
+          chunk = chunk.subarray(0, chunk.length-4);
         } else {
           nextChunkSize = 0;
         }
@@ -222,7 +225,8 @@ function decryptBlob(key, nonce, blob, mimeType, doneCallback, errorCallback, pr
   worker.postMessage({
     name: 'DECRYPT_START',
     key: key,
-    nonce: nonce
+    nonce: nonce,
+    maxChunkLength: CHUNK_LENGTH
   });
 }
 
@@ -232,7 +236,7 @@ function decryptBlob(key, nonce, blob, mimeType, doneCallback, errorCallback, pr
 var key = new Uint8Array(32);
 var nonce = new Uint8Array(16);
 //var arr = nacl.util.decodeUTF8('Hello, chunky!');
-var arr = new Uint8Array(10 * 1024*1024);
+var arr = new Uint8Array(10 * 1024*1024 + 111);
 for (var i = 0; i < arr.length; i++) arr[i] = i & 0xff;
 var blob = new Blob([arr]);
 

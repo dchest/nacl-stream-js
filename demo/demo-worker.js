@@ -11,7 +11,7 @@ onmessage = function(event) {
   switch (event.data.name) {
 
     case 'ENCRYPT_START':
-      startEncryption(event.data.key, event.data.nonce);
+      startEncryption(event.data.key, event.data.nonce, event.data.maxChunkLength);
       break;
     case 'ENCRYPT_CHUNK':
       encryptChunk(event.data.chunk, event.data.isLast);
@@ -24,7 +24,7 @@ onmessage = function(event) {
       break;
 
     case 'DECRYPT_START':
-      startDecryption(event.data.key, event.data.nonce);
+      startDecryption(event.data.key, event.data.nonce, event.data.maxChunkLength);
       break;
     case 'DECRYPT_CHUNK':
       decryptChunk(event.data.chunk, event.data.isLast);
@@ -43,8 +43,8 @@ onmessage = function(event) {
 
 var encryptor = null;
 
-function startEncryption(key, nonce) {
-  encryptor = nacl.stream.createEncryptor(key, nonce);
+function startEncryption(key, nonce, maxChunkLength) {
+  encryptor = nacl.stream.createEncryptor(key, nonce, maxChunkLength);
   postMessage({
     name: 'ENCRYPT_START_OK'
   });
@@ -79,8 +79,8 @@ function cancelEncryption(reason) {
 
 var decryptor = null;
 
-function startDecryption(key, nonce) {
-  decryptor = nacl.stream.createDecryptor(key, nonce);
+function startDecryption(key, nonce, maxChunkLength) {
+  decryptor = nacl.stream.createDecryptor(key, nonce, maxChunkLength);
   postMessage({
     name: 'DECRYPT_START_OK'
   });
