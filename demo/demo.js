@@ -248,6 +248,7 @@ encryptBlob(
     console.log('encryptedBlob:', encryptedBlob);
 
     startTime = new Date();
+    document.body.innerHTML += '<a href="' + URL.createObjectURL(encryptedBlob) + '">Get encrypted</a>';
 
     decryptBlob(
       key,
