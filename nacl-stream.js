@@ -50,7 +50,7 @@
     if (key.length !== 32) throw new Error('bad key length, must be 32 bytes');
     if (nonce.length !== 16) throw new Error('bad nonce length, must be 16 bytes');
     if (maxChunkLength >= 0xffffffff) throw new Error('max chunk length is too large');
-    if (maxChunkLength < 16) throw new Eror('max chunk length is too small');
+    if (maxChunkLength < 16) throw new Error('max chunk length is too small');
   }
 
   function StreamEncryptor(key, nonce, maxChunkLength) {
