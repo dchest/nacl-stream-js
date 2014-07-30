@@ -20,7 +20,7 @@ onmessage = function(event) {
       finishEncryption();
       break;
     case 'ENCRYPT_CANCEL':
-      cancelEncryption(event.data.reason);  
+      cancelEncryption(event.data.reason);
       break;
 
     case 'DECRYPT_START':
@@ -33,7 +33,7 @@ onmessage = function(event) {
       finishDecryption();
       break;
     case 'DECRYPT_CANCEL':
-      cancelDecryption(event.data.reason);  
+      cancelDecryption(event.data.reason);
       break;
 
     default:

@@ -180,7 +180,7 @@ function decryptBlob(key, nonce, blob, mimeType, doneCallback, errorCallback, pr
     if (nextChunkSize === -1) {
       // We are just starting, so read first chunk length.
       if (position + 2 >= blob.size) {
-        error('blob is too short'); 
+        error('blob is too short');
         return;
       }
       readBlobSlice(blob, position, position + 2, function(data) {
@@ -231,7 +231,8 @@ function decryptBlob(key, nonce, blob, mimeType, doneCallback, errorCallback, pr
 
 var key = new Uint8Array(32);
 var nonce = new Uint8Array(16);
-var arr = new Uint8Array(1 * 1024*1024);
+//var arr = nacl.util.decodeUTF8('Hello, chunky!');
+var arr = new Uint8Array(10 * 1024*1024);
 for (var i = 0; i < arr.length; i++) arr[i] = i & 0xff;
 var blob = new Blob([arr]);
 
@@ -257,6 +258,8 @@ encryptBlob(
         console.log('decryption finished in ', (((new Date()) - startTime) / 1000) + ' s');
         console.log('decryptedBlob:', decryptedBlob);
         compareBlobs(blob, decryptedBlob);
+        //console.log('DECRYPTED:',  nacl.util.encodeUTF8(decryptedBlob));
+        document.body.innerHTML += '<a href="' + URL.createObjectURL(decryptedBlob) + '">Get decrypted</a>';
       },
       function(err) {
         console.log('DECRYPTION ERROR: ' + err);
@@ -265,7 +268,7 @@ encryptBlob(
         console.log('decrypting... ' + position + '/' + size);
       }
     );
-      
+
   },
   function(err) {
     console.log('ENCRYPTION ERROR: ' + err);
