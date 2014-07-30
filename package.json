@@ -1,6 +1,6 @@
 {
   "name": "nacl-stream",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Streaming encryption based on TweetNaCl.js",
   "main": "nacl-stream.js",
   "directories": {
