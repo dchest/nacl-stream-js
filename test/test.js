@@ -1,6 +1,11 @@
+/* jshint node:true */
+'use strict';
+
 var test = require('tape');
 var nacl = require('tweetnacl/nacl-fast');
 var naclStream = require('../nacl-stream').stream;
+
+var MAX_CHUNK_LENGTH = 65535;
 
 test('stream', function(t) {
   var i, j, isLast;
@@ -14,8 +19,8 @@ test('stream', function(t) {
   // Encrypt.
   var encryptedChunks = [];
   var e = naclStream.createEncryptor(key, nonce);
-  for (i = 0; i < data.length; i += naclStream.maxChunkLength) {
-    var chunkLen = Math.min(naclStream.maxChunkLength, data.length - i);
+  for (i = 0; i < data.length; i += MAX_CHUNK_LENGTH) {
+    var chunkLen = Math.min(MAX_CHUNK_LENGTH, data.length - i);
     isLast = (data.length - i - chunkLen === 0);
     var ec = e.encryptChunk(data.subarray(i, i+chunkLen), isLast);
     encryptedChunks.push(new Uint8Array(ec));
@@ -25,7 +30,7 @@ test('stream', function(t) {
     console.log((new Buffer(chunk)).toString('hex'));
   });
   */
-  t.throws(function() { e.encryptedChunk(data.subarray(0, 1000)) }, Error, 'should throw if encryptChunk called after last chunk');
+  t.throws(function() { e.encryptedChunk(data.subarray(0, 1000)); }, Error, 'should throw if encryptChunk called after last chunk');
   e.clean();
 
   // Decrypt.
@@ -38,7 +43,7 @@ test('stream', function(t) {
       if (!dc) return null;
       decryptedChunks.push(new Uint8Array(dc));
     }
-    t.throws(function() { e.decryptChunk(chunks[0]) }, Error, 'should throw if decryptChunk called after last chunk');
+    t.throws(function() { e.decryptChunk(chunks[0]); }, Error, 'should throw if decryptChunk called after last chunk');
     d.clean();
     return decryptedChunks;
   }
