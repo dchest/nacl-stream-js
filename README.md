@@ -56,7 +56,7 @@ Returns a stream encryptor object using 32-byte key and 16-byte nonce (both of
 Encrypts the given `Uint8Array` chunk and returns an `Uint8Array` subarray of
 the internal temporary space containing concatenation of chunk length and
 encrypted chunk. Callers must copy the result into their own buffer, as the
-next call to `encryptChunk` will overwrite the contents of returned
+next call to `encryptChunk` or `clean` will overwrite the contents of returned
 `Uint8Array`.
 
 If encrypting the last chunk of stream, `isLast` must be set to `true`.
@@ -75,9 +75,9 @@ Returns a stream decryptor object using 32-byte key and 16-byte nonce (both of
 Decrypts the given `Uint8Array` encrypted chunk and returns an `Uint8Array`
 subarray of the internal temporary space containing the decrypted chunk.
 Callers must copy the result into their own buffer, as the next call to
-`decryptChunk` will overwrite the contents of returned `Uint8Array`. The given
-encryptedChunk should be in the format created by `encryptChunk`, i.e. prefixed
-with original chunk length.
+`decryptChunk` or `clean` will overwrite the contents of returned `Uint8Array`.
+The given encryptedChunk should be in the format created by `encryptChunk`,
+i.e. prefixed with original chunk length.
 
 Returns `null` if the chunk cannot be decrypted. In this case, futher
 calls to `decryptChunk` will deliberately fail: callers should stop trying
