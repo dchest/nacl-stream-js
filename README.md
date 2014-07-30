@@ -53,11 +53,8 @@ Returns a stream encryptor object using 32-byte key and 16-byte nonce (both of
 
 #### *encryptor*.encryptChunk(chunk, isLast)
 
-Encrypts the given `Uint8Array` chunk and returns an `Uint8Array` subarray of
-the internal temporary space containing concatenation of chunk length and
-encrypted chunk. Callers must copy the result into their own buffer, as the
-next call to `encryptChunk` or `clean` will overwrite the contents of returned
-`Uint8Array`.
+Encrypts the given `Uint8Array` chunk and returns a new `Uint8Array` array
+with encrypted chunk.
 
 If encrypting the last chunk of stream, `isLast` must be set to `true`.
 
@@ -72,10 +69,9 @@ Returns a stream decryptor object using 32-byte key and 16-byte nonce (both of
 
 #### *decryptor*.decryptChunk(encryptedChunk, isLast)
 
-Decrypts the given `Uint8Array` encrypted chunk and returns an `Uint8Array`
-subarray of the internal temporary space containing the decrypted chunk.
-Callers must copy the result into their own buffer, as the next call to
-`decryptChunk` or `clean` will overwrite the contents of returned `Uint8Array`.
+Decrypts the given `Uint8Array` encrypted chunk and returns a new `Uint8Array`
+array with decrypted chunk.
+
 The given encryptedChunk should be in the format created by `encryptChunk`,
 i.e. prefixed with original chunk length.
 

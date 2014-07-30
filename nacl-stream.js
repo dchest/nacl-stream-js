@@ -68,7 +68,7 @@
     var encryptedChunk = this._out.subarray(BOXZEROBYTES-2, BOXZEROBYTES-2 + chunkLen+16+2);
     encryptedChunk[0] = (chunkLen >>> 0) & 0xff;
     encryptedChunk[1] = (chunkLen >>> 8) & 0xff;
-    return encryptedChunk;
+    return new Uint8Array(encryptedChunk);
   };
 
   StreamEncryptor.prototype.clean = function() {
@@ -114,7 +114,7 @@
     if (crypto_secretbox_open(this._out, this._in, encryptedChunkLen+BOXZEROBYTES-2,
                 this._fullNonce, this._key) !== 0) return this._fail();
     incrementChunkCounter(this._fullNonce);
-    return this._out.subarray(ZEROBYTES, ZEROBYTES + chunkLen);
+    return new Uint8Array(this._out.subarray(ZEROBYTES, ZEROBYTES + chunkLen));
   };
 
   StreamDecryptor.prototype.clean = function() {
