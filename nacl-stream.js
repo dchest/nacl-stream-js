@@ -17,18 +17,21 @@
 
   var ZEROBYTES = nacl.lowlevel.crypto_secretbox_ZEROBYTES;
   var BOXZEROBYTES = nacl.lowlevel.crypto_secretbox_BOXZEROBYTES;
-  var crypto_secretbox = nacl.lowlevel.crypto_secretbox;
-  var crypto_secretbox_open = nacl.lowlevel.crypto_secretbox_open;
+  var crypto_core_hsalsa20 = nacl.lowlevel.crypto_core_hsalsa20;
+  var crypto_stream_salsa20 = nacl.lowlevel.crypto_stream_salsa20;
+  var crypto_stream_salsa20_xor = nacl.lowlevel.crypto_stream_salsa20_xor;
+  var crypto_onetimeauth = nacl.lowlevel.crypto_onetimeauth;
+  var crypto_onetimeauth_verify = nacl.lowlevel.crypto_onetimeauth_verify;
 
-  function incrementChunkCounter(fullNonce) {
-    for (var i = 16; i < 24; i++) {
-      fullNonce[i]++;
-      if (fullNonce[i]) break;
+  function incrementChunkCounter(ctr) {
+    for (var i = 0; i < 8; i++) {
+      ctr[i]++;
+      if (ctr[i]) break;
     }
   }
 
-  function setLastChunkFlag(fullNonce) {
-    fullNonce[23] |= 0x80;
+  function setLastChunkFlag(ctr) {
+    ctr[7] |= 0x80;
   }
 
   function clean() {
@@ -43,8 +46,7 @@
     if (data.length < offset + 4) return -1;
     return data[offset] | data[offset+1] << 8 |
            data[offset+2] << 16 | data[offset+3] << 24;
-  };
-
+  }
 
   function checkArgs(key, nonce, maxChunkLength) {
     if (key.length !== 32) throw new Error('bad key length, must be 32 bytes');
@@ -53,11 +55,44 @@
     if (maxChunkLength < 16) throw new Error('max chunk length is too small');
   }
 
+  // constant for hsalsa20, "expand 32-byte k"
+  var SIGMA = new Uint8Array([101, 120, 112, 97, 110, 100, 32, 51, 50, 45, 98, 121, 116, 101, 32, 107]);
+
+  // Derives a 32-byte XSalsa20 subkey from 32-byte key and 16-byte nonce.
+  function deriveSubkey(key, nonce) {
+    var subkey = new Uint8Array(32);
+    crypto_core_hsalsa20(subkey, nonce, key, SIGMA);
+    return subkey;
+  }
+
+  // crypto_secretbox_subkey is like NaCl's crypto_secretbox,
+  // but uses pre-derived XSalsa20 subkey.
+  function crypto_secretbox_subkey(c,m,d,n,subkey) {
+    var i;
+    if (d < 32) return -1;
+    crypto_stream_salsa20_xor(c,0,m,0,d,n,subkey);
+    crypto_onetimeauth(c, 16, c, 32, d - 32, c);
+    for (i = 0; i < 16; i++) c[i] = 0;
+    return 0;
+  }
+
+  // crypto_secretbox_subkey_open is like NaCl's crypto_secretbox_open,
+  // but uses pre-derived XSalsa20 subkey.
+  function crypto_secretbox_subkey_open(m,c,d,n,subkey) {
+    var i;
+    var x = new Uint8Array(32);
+    if (d < 32) return -1;
+    crypto_stream_salsa20(x,0,32,n,subkey);
+    if (crypto_onetimeauth_verify(c, 16,c, 32,d - 32,x) !== 0) return -1;
+    crypto_stream_salsa20_xor(m,0,c,0,d,n,subkey);
+    for (i = 0; i < 32; i++) m[i] = 0;
+    return 0;
+  }
+
   function StreamEncryptor(key, nonce, maxChunkLength) {
     checkArgs(key, nonce, maxChunkLength);
-    this._key = key;
-    this._fullNonce = new Uint8Array(24);
-    this._fullNonce.set(nonce);
+    this._subkey = deriveSubkey(key, nonce);
+    this._chunkCounter = new Uint8Array(8);
     this._maxChunkLength = maxChunkLength || DEFAULT_MAX_CHUNK;
     this._in = new Uint8Array(ZEROBYTES + this._maxChunkLength);
     this._out = new Uint8Array(ZEROBYTES + this._maxChunkLength);
@@ -72,11 +107,11 @@
     for (var i = 0; i < ZEROBYTES; i++) this._in[i] = 0;
     this._in.set(chunk, ZEROBYTES);
     if (isLast) {
-      setLastChunkFlag(this._fullNonce);
+      setLastChunkFlag(this._chunkCounter);
       this._done = true;
     }
-    crypto_secretbox(this._out, this._in, chunkLen + ZEROBYTES, this._fullNonce, this._key);
-    incrementChunkCounter(this._fullNonce);
+    crypto_secretbox_subkey(this._out, this._in, chunkLen + ZEROBYTES, this._chunkCounter, this._subkey);
+    incrementChunkCounter(this._chunkCounter);
     var encryptedChunk = this._out.subarray(BOXZEROBYTES-4, BOXZEROBYTES-4 + chunkLen+16+4);
     encryptedChunk[0] = (chunkLen >>>  0) & 0xff;
     encryptedChunk[1] = (chunkLen >>>  8) & 0xff;
@@ -86,14 +121,13 @@
   };
 
   StreamEncryptor.prototype.clean = function() {
-    clean(this._fullNonce, this._in, this._out);
+    clean(this._chunkCounter, this._in, this._out);
   };
 
   function StreamDecryptor(key, nonce, maxChunkLength) {
     checkArgs(key, nonce, maxChunkLength);
-    this._key = key;
-    this._fullNonce = new Uint8Array(24);
-    this._fullNonce.set(nonce);
+    this._subkey = deriveSubkey(key, nonce);
+    this._chunkCounter = new Uint8Array(8);
     this._maxChunkLength = maxChunkLength || DEFAULT_MAX_CHUNK;
     this._in = new Uint8Array(ZEROBYTES + this._maxChunkLength);
     this._out = new Uint8Array(ZEROBYTES + this._maxChunkLength);
@@ -118,17 +152,17 @@
     for (var i = 0; i < BOXZEROBYTES; i++) this._in[i] = 0;
     for (i = 0; i < encryptedChunkLen-4; i++) this._in[BOXZEROBYTES+i] = encryptedChunk[i+4];
     if (isLast) {
-      setLastChunkFlag(this._fullNonce);
+      setLastChunkFlag(this._chunkCounter);
       this._done = true;
     }
-    if (crypto_secretbox_open(this._out, this._in, encryptedChunkLen+BOXZEROBYTES-4,
-                this._fullNonce, this._key) !== 0) return this._fail();
-    incrementChunkCounter(this._fullNonce);
+    if (crypto_secretbox_subkey_open(this._out, this._in, encryptedChunkLen+BOXZEROBYTES-4,
+                this._chunkCounter, this._subkey) !== 0) return this._fail();
+    incrementChunkCounter(this._chunkCounter);
     return new Uint8Array(this._out.subarray(ZEROBYTES, ZEROBYTES + chunkLen));
   };
 
   StreamDecryptor.prototype.clean = function() {
-    clean(this._fullNonce, this._in, this._out);
+    clean(this._chunkCounter, this._in, this._out);
   };
 
   return {
