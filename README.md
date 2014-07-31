@@ -62,7 +62,7 @@ If encrypting the last chunk of stream, `isLast` must be set to `true`.
  
 Zeroes out temporary space. Should be called after encrypting all chunks.
 
-### stream.createDecryptor(key, nonce)
+### stream.createDecryptor(key, nonce, maxChunkLength)
 
 Returns a stream decryptor object using 32-byte key and 16-byte nonce (both of
 `Uint8Array` type) and the maximum chunk length with the following methods:
