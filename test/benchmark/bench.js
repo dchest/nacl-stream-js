@@ -1,6 +1,5 @@
-var test = require('tape');
-var nacl = require('tweetnacl/nacl-fast');
-var naclStream = require('../../nacl-stream').stream;
+var nacl = typeof require !== 'undefined' ? require('tweetnacl/nacl-fast') : window.nacl;
+var naclStream = typeof require !== 'undefined' ? require('../../nacl-stream').stream : window.nacl.stream;
 
 var MB = 5;
 
