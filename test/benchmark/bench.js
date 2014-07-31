@@ -2,7 +2,7 @@ var test = require('tape');
 var nacl = require('tweetnacl/nacl-fast');
 var naclStream = require('../../nacl-stream').stream;
 
-var MB = 10;
+var MB = 5;
 
 function benchmark(fn, bytes) {
   var start = new Date();
@@ -43,6 +43,6 @@ function benchmarkEncryptorDecryptor() {
   }, chunk.length);
 }
 
-benchmarkSecretbox();
 benchmarkEncryptor();
 benchmarkEncryptorDecryptor();
+benchmarkSecretbox();
