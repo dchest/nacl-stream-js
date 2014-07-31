@@ -4,17 +4,15 @@
 var test = require('tape');
 var nacl = require('tweetnacl/nacl-fast');
 var naclStream = require('../nacl-stream').stream;
+var byteSequence = require('./utils').byteSequence;
 
 var MAX_CHUNK_LENGTH = 65535;
 
 test('stream', function(t) {
   var i, j, isLast;
-  var key = new Uint8Array(32);
-  for (i = 0; i < key.length; i++) key[i] = (i) & 0xff;
-  var nonce = new Uint8Array(16);
-  for (i = 0; i < nonce.length; i++) nonce[i] = (i+32) & 0xff;
-  var data = new Uint8Array(1024*1024+111);
-  for (i = 0; i < data.length; i++) data[i] = i & 0xff;
+  var key = byteSequence(32);
+  var nonce = byteSequence(16);
+  var data = byteSequence(1024*1024+111);
 
   // Encrypt.
   var encryptedChunks = [];
@@ -23,7 +21,7 @@ test('stream', function(t) {
     var chunkLen = Math.min(MAX_CHUNK_LENGTH, data.length - i);
     isLast = (data.length - i - chunkLen === 0);
     var ec = e.encryptChunk(data.subarray(i, i+chunkLen), isLast);
-    encryptedChunks.push(new Uint8Array(ec));
+    encryptedChunks.push(ec);
   }
   /*// debugging
   encryptedChunks.forEach(function(chunk) {
@@ -41,7 +39,7 @@ test('stream', function(t) {
       isLast = (i === chunks.length - 1);
       var dc = d.decryptChunk(chunks[i], isLast);
       if (!dc) return null;
-      decryptedChunks.push(new Uint8Array(dc));
+      decryptedChunks.push(dc);
     }
     t.throws(function() { e.decryptChunk(chunks[0]); }, Error, 'should throw if decryptChunk called after last chunk');
     d.clean();

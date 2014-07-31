@@ -34,6 +34,6 @@
     "tape": "^2.13.4"
   },
   "dependencies": {
-    "tweetnacl": "^0.10.0"
+    "tweetnacl": "^0.10.1"
   }
 }

@@ -28,6 +28,6 @@
     "test"
   ],
   "dependencies": {
-    "tweetnacl": "^0.10.0"
+    "tweetnacl": "^0.10.1"
   }
 }
