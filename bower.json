@@ -1,6 +1,6 @@
 {
   "name": "nacl-stream",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "homepage": "https://github.com/dchest/nacl-stream-js",
   "authors": [
     "Dmitry Chestnykh <dmitry@codingrobots.com>"
@@ -28,6 +28,6 @@
     "test"
   ],
   "dependencies": {
-    "tweetnacl": "0.11.x"
+    "tweetnacl": "0.x.x"
   }
 }

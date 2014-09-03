@@ -1,6 +1,6 @@
 {
   "name": "nacl-stream",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Streaming encryption based on TweetNaCl.js",
   "main": "nacl-stream.js",
   "directories": {
@@ -8,7 +8,7 @@
   },
   "scripts": {
     "build": "uglifyjs nacl-stream.js -c -m -o nacl-stream.min.js",
-    "test": "tape test/*.js | faucet"
+    "test": "faucet test/*.js"
   },
   "repository": {
     "type": "git",
@@ -30,10 +30,11 @@
   },
   "homepage": "https://github.com/dchest/nacl-stream-js",
   "devDependencies": {
-    "faucet": "0.0.1",
-    "tape": "^2.13.4"
+    "faucet": "0.x.x",
+    "tape": "2.x.x",
+    "uglify-js": "2.x.x"
   },
   "dependencies": {
-    "tweetnacl": "0.11.x"
+    "tweetnacl": "0.x.x"
   }
 }
