@@ -43,8 +43,7 @@
     if (data.length < offset + 4) return -1;
     return data[offset] | data[offset+1] << 8 |
            data[offset+2] << 16 | data[offset+3] << 24;
-  };
-
+  }
 
   function checkArgs(key, nonce, maxChunkLength) {
     if (key.length !== 32) throw new Error('bad key length, must be 32 bytes');
