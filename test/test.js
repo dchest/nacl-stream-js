@@ -28,7 +28,7 @@ test('stream', function(t) {
     console.log((new Buffer(chunk)).toString('hex'));
   });
   */
-  t.throws(function() { e.encryptedChunk(data.subarray(0, 1000)); }, Error, 'should throw if encryptChunk called after last chunk');
+  t.throws(function() { e.encryptChunk(data.subarray(0, 1000)); }, Error, 'should throw if encryptChunk was called after the last chunk');
   e.clean();
 
   // Decrypt.
