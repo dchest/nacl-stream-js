@@ -41,7 +41,7 @@ test('stream', function(t) {
       if (!dc) return null;
       decryptedChunks.push(dc);
     }
-    t.throws(function() { e.decryptChunk(chunks[0]); }, Error, 'should throw if decryptChunk called after last chunk');
+    t.throws(function() { d.decryptChunk(chunks[0]); }, Error, 'should throw if decryptChunk called after last chunk');
     d.clean();
     return decryptedChunks;
   }
