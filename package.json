@@ -1,6 +1,6 @@
 {
   "name": "nacl-stream",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Streaming encryption based on TweetNaCl.js",
   "main": "nacl-stream.js",
   "directories": {
@@ -24,17 +24,18 @@
     "file"
   ],
   "author": "Dmitry Chestnykh",
-  "license": "Public domain",
+  "license": "Unlicense",
   "bugs": {
     "url": "https://github.com/dchest/nacl-stream-js/issues"
   },
   "homepage": "https://github.com/dchest/nacl-stream-js",
   "devDependencies": {
-    "faucet": "0.x.x",
-    "tape": "2.x.x",
-    "uglify-js": "2.x.x"
+    "faucet": "^0.0.1",
+    "tape": "^4.6.3",
+    "tweetnacl-util": "^0.15.0",
+    "uglify-js": "^2.8.22"
   },
   "dependencies": {
-    "tweetnacl": "0.x.x"
+    "tweetnacl": "^1.0.0-rc.1"
   }
 }

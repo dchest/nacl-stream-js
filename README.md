@@ -1,7 +1,7 @@
 nacl-stream: streaming encryption based on TweetNaCl.js
 =======================================================
 
-Written by Dmitry Chestnykh in 2014. Public domain. 
+Written by Dmitry Chestnykh in 2014. Public domain.
 <https://github.com/dchest/nacl-stream-js>
 
 Based on
@@ -59,7 +59,7 @@ with encrypted chunk.
 If encrypting the last chunk of stream, `isLast` must be set to `true`.
 
 #### *encryptor*.clean()
- 
+
 Zeroes out temporary space. Should be called after encrypting all chunks.
 
 ### stream.createDecryptor(key, nonce, maxChunkLength)
@@ -83,7 +83,7 @@ chunks.
 If decrypting the last chunk of stream, `isLast` must be set to `true`.
 
 #### *decryptor*.clean()
- 
+
 Zeroes out temporary space. Should be called after decrypting all chunks.
 
 #### stream.readChunkLength(data[, offset])

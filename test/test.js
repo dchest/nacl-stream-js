@@ -2,7 +2,8 @@
 'use strict';
 
 var test = require('tape');
-var nacl = require('tweetnacl/nacl-fast');
+var nacl = require('tweetnacl');
+nacl.util = require('tweetnacl-util');
 var naclStream = require('../nacl-stream').stream;
 var byteSequence = require('./utils').byteSequence;
 
