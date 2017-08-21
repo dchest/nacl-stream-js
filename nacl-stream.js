@@ -5,7 +5,7 @@
  */
 (function(root, f) {
   'use strict';
-  if (typeof module !== 'undefined' && module.exports) module.exports.stream = f(require('tweetnacl/nacl-fast'));
+  if (typeof module !== 'undefined' && module.exports) module.exports.stream = f(require('tweetnacl'));
   else root.nacl.stream = f(root.nacl);
 
 }(this, function(nacl) {
