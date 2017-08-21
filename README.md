@@ -40,7 +40,7 @@ Format description
 Usage
 -----
 
-**The API is fairy low-level and should be used as a building block for some
+**The API is fairly low-level and should be used as a building block for some
 high-level API which would deal with actual streams or files.**
 
 The module provides two constructor functions (in `window.nacl` namespace or as
