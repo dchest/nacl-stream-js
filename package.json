@@ -31,11 +31,11 @@
   "homepage": "https://github.com/dchest/nacl-stream-js",
   "devDependencies": {
     "faucet": "^0.0.1",
-    "tape": "^4.6.3",
+    "tape": "^4.8.0",
     "tweetnacl-util": "^0.15.0",
-    "uglify-js": "^2.8.22"
+    "uglify-js": "^3.0.28"
   },
   "dependencies": {
-    "tweetnacl": "^1.0.0-rc.1"
+    "tweetnacl": "^1.0.0"
   }
 }
