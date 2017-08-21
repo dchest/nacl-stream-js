@@ -10,8 +10,6 @@ Based on
 [![Build Status](https://travis-ci.org/dchest/nacl-stream-js.svg?branch=master)
 ](https://travis-ci.org/dchest/nacl-stream-js)
 
-:warning: **ALPHA VERSION! There will be bugs. May change. May break.** :warning:
-
 Format description
 ------------------
 
