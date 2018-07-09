@@ -90,3 +90,7 @@ Reads four bytes from the given offset (or from the beginning, if no offset is
 given) of `Uint8Array` data and returns the chunk length. Length of
 encryptedChunk passed to `decryptChunk` should be 4 + 16 + *chunkLength* bytes.
 
+
+## See also
+
+- [nacl-blob](https://github.com/bcomnes/nacl-blob)
